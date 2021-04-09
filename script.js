@@ -24,6 +24,7 @@ function operate(operator, a, b) {
 let valList = '';
 let valStack = []
 let acceptOperator = false;
+let answerGiven = false;
 
 const numberButtons = Array.from(document.querySelectorAll(".num"));
 const operatorButtons = Array.from(document.querySelectorAll(".op"));
@@ -34,7 +35,10 @@ function addToStack(val) {
 }
 
 function updateDisplay() {
+    if (answerGiven) {
     display.textContent = valStack[0];
+    }
+    else display.textContent = valList;
 }
 
 function clearAll() {
@@ -44,6 +48,10 @@ function clearAll() {
 
 document.addEventListener('click', (e) => {
     if (numberButtons.includes(e.target)) { 
+        if (answerGiven) { 
+            valList = '';
+            answerGiven = false;
+            }
         const valToAdd = e.target.getAttribute("data-val");
         addToStack(valToAdd);
         acceptOperator = true;
@@ -51,18 +59,25 @@ document.addEventListener('click', (e) => {
         clearAll()
     } else if (operatorButtons.includes(e.target)) {
         if (acceptOperator) {
+            if(answerGiven) {
+                valList = valStack[0];
+            }
+            answerGiven = false;
             const valToAdd = ` ${e.target.getAttribute("data-disp")} `;
             addToStack(valToAdd);
             acceptOperator = false;
         }
     } else if (e.target.getAttribute('id') == "btn-equal") {
+        
         valStack = valList.split(' ');
         while (valStack.length > 1) {
             let sum = operate(valStack[1],valStack[0],valStack[2]);
             valStack[0] = `${sum}`;
             valStack.splice(1, 2);
         }
+        answerGiven = true;
     } else return;
-
+    console.log(valList);
+    console.log(valStack);
     updateDisplay();
 });

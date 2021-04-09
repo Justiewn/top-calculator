@@ -1,10 +1,8 @@
-* {
-    border: 1px solid black;
-
-}
 
 p {
     font-family: 'Orbitron', sans-serif;
+    padding: 0;
+    margin: 0;
 }
 
 main {
@@ -14,15 +12,27 @@ main {
     align-items: center;
 }
 
+#calculator-div {
+    padding-top: 10px;
+    border: 1px solid black;
+}
+
 #screen {
+    margin: auto;
     text-align: right;
     min-height: 50px;
-    width: 100%;
-    max-width: 1000px;
+    max-height: 50px;
+    width: 95%;
+    
+    border: 1px solid black;
 }
 
 #display-content {
+    font-size: 30px;
     padding: 0 5px;
+    max-height: 50px;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 #buttons-div {
@@ -44,10 +54,19 @@ main {
     -moz-user-select: none;
     -o-user-select: none;
     user-select: none;
+    box-shadow: 0 0 1px 1px ;
 }
 
 .button:hover {
     background: grey;
+}
+
+.num {
+    background: olive;
+}
+
+.op {
+    background: orange;
 }
 
 
