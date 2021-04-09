@@ -60,9 +60,9 @@ function numberAction(button) {
 function backAction() {
     answerGiven = false;
     if (valList.slice(-1) == " ") {
-        console.log("GET")
-        valList = valList.slice(0, -2);
-    } else console.log("HUH"); valList = valList.slice(0, -1); 
+        valList = valList.slice(0, -3);
+    } else valList = valList.slice(0, -1); 
+    acceptOperator = true;
 }
 
 function operatorAction(op) {
