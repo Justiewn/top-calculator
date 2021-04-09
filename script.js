@@ -1,17 +1,17 @@
 function add(a, b) {
-    return a + b;
+    return +a + +b;
 }
 
 function subtract(a, b) {
-    return a - b;
+    return +a - +b;
 }
 
 function multiply(a, b) {
-    return a * b;
+    return +a * +b;
 }
 
 function divide(a, b) {
-    return a / b;
+    return +a / +b;
 }
 
 function operate(operator, a, b) {
@@ -21,56 +21,48 @@ function operate(operator, a, b) {
     if (operator == '/') return divide(a, b);
 }
 
-let firstNumber = 0;
-let secondNumber = '';
-let displayOperator;
-let actionOperator;
-let stage = 0;
-let answer;
+let valList = '';
+let valStack = []
+let acceptOperator = false;
 
 const numberButtons = Array.from(document.querySelectorAll(".num"));
 const operatorButtons = Array.from(document.querySelectorAll(".op"));
 const display = document.querySelector("#display-content")
 
-function addToNumber(num, stage) {
-    if (stage == 0) {
-        firstNumber = (firstNumber * 10) + +num;}
-    if (stage == 1) {
-        secondNumber = (secondNumber * 10) + +num;}
+function addToStack(val) {
+    valList += val;
 }
 
 function updateDisplay() {
-    if (stage == 0) display.textContent = firstNumber;
-    if (stage == 1) display.textContent = `${firstNumber} ${displayOperator} ${secondNumber}`;
-    if (stage == 2) display.textContent = answer;
+    display.textContent = valStack[0];
 }
 
 function clearAll() {
-    firstNumber = 0;
-    secondNumber = '';
-    displayOperator = '';
-    actionOperator = '';
-    stage = 0;
+    valList = '';
+    valStack = [];
 }
 
 document.addEventListener('click', (e) => {
     if (numberButtons.includes(e.target)) { 
-        if (stage == 2) { 
-            clearAll() 
-            stage = 0;
-        }
-        const valToAdd = e.target.getAttribute('data-val')
-        addToNumber(valToAdd, stage);
+        const valToAdd = e.target.getAttribute("data-val");
+        addToStack(valToAdd);
+        acceptOperator = true;
     } else if (e.target.getAttribute('id') == "btn-clear") {
         clearAll()
     } else if (operatorButtons.includes(e.target)) {
-        actionOperator = e.target.getAttribute('data-disp');
-        displayOperator = e.target.getAttribute('data-disp');
-        stage = 1;
+        if (acceptOperator) {
+            const valToAdd = ` ${e.target.getAttribute("data-disp")} `;
+            addToStack(valToAdd);
+            acceptOperator = false;
+        }
     } else if (e.target.getAttribute('id') == "btn-equal") {
-        stage = 2;
-        answer = operate(actionOperator, firstNumber, secondNumber );
-    }
-    updateDisplay()
-});
+        valStack = valList.split(' ');
+        while (valStack.length > 1) {
+            let sum = operate(valStack[1],valStack[0],valStack[2]);
+            valStack[0] = `${sum}`;
+            valStack.splice(1, 2);
+        }
+    } else return;
 
+    updateDisplay();
+});
