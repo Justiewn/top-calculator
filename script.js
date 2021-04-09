@@ -87,9 +87,36 @@ function equalsAction() {
     answerGiven = true;
 }
 
+function hasDecimal() {
+    console.log(valList);
+    let allItems = valList.split(/([+\-x/])/);
+    let allNums = allItems.filter( num => num.match(/\d/));
+    console.log(allNums);
+    let currentNumber = `${allNums[allNums.length - 1]}`;
+    console.log(currentNumber);
+    console.log(currentNumber.includes('.'));
+    if (currentNumber.includes('.')) return true;
+    return false;
+}
+
+
+function decAction() {
+    console.log("what")
+    if (answerGiven) { 
+        valList = '';
+        answerGiven = false;
+        }
+    const valToAdd = '.'
+    addToStack(valToAdd);
+    acceptOperator = true;
+}
+
 document.addEventListener('click', (e) => {
     if (numberButtons.includes(e.target)) { 
         numberAction(e.target);
+    } else if (e.target.getAttribute('id') == "btn-dec") {
+        if (hasDecimal()) return;
+        decAction();
     } else if (e.target.getAttribute('id') == "btn-clear") {
         clearAll();
         return;
@@ -102,6 +129,7 @@ document.addEventListener('click', (e) => {
     } else return;
     updateDisplay();
 
+    hasDecimal() ;
     //console.log(valList);
     //console.log(valStack);
 });
