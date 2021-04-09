@@ -42,42 +42,66 @@ function updateDisplay() {
 }
 
 function clearAll() {
+    display.textContent = '0';
     valList = '';
     valStack = [];
 }
 
-document.addEventListener('click', (e) => {
-    if (numberButtons.includes(e.target)) { 
-        if (answerGiven) { 
-            valList = '';
-            answerGiven = false;
-            }
-        const valToAdd = e.target.getAttribute("data-val");
-        addToStack(valToAdd);
-        acceptOperator = true;
-    } else if (e.target.getAttribute('id') == "btn-clear") {
-        clearAll()
-    } else if (operatorButtons.includes(e.target)) {
-        if (acceptOperator) {
-            if(answerGiven) {
-                valList = valStack[0];
-            }
-            answerGiven = false;
-            const valToAdd = ` ${e.target.getAttribute("data-disp")} `;
-            addToStack(valToAdd);
-            acceptOperator = false;
+function numberAction(button) {
+    if (answerGiven) { 
+        valList = '';
+        answerGiven = false;
         }
-    } else if (e.target.getAttribute('id') == "btn-equal") {
-        
-        valStack = valList.split(' ');
+    const valToAdd = button.getAttribute("data-val");
+    addToStack(valToAdd);
+    acceptOperator = true;
+}
+
+function backAction() {
+    answerGiven = false;
+    if (valList.slice(-1) == " ") {
+        console.log("GET")
+        valList = valList.slice(0, -2);
+    } else console.log("HUH"); valList = valList.slice(0, -1); 
+}
+
+function operatorAction(op) {
+    if (acceptOperator) {
+        if(answerGiven) {
+            valList = valStack[0];
+        }
+        answerGiven = false;
+        const valToAdd = ` ${op.getAttribute("data-disp")} `;
+        addToStack(valToAdd);
+        acceptOperator = false;
+    }
+}
+
+function equalsAction() {
+    valStack = valList.split(' ');
         while (valStack.length > 1) {
             let sum = operate(valStack[1],valStack[0],valStack[2]);
             valStack[0] = `${sum}`;
             valStack.splice(1, 2);
         }
-        answerGiven = true;
+    answerGiven = true;
+}
+
+document.addEventListener('click', (e) => {
+    if (numberButtons.includes(e.target)) { 
+        numberAction(e.target);
+    } else if (e.target.getAttribute('id') == "btn-clear") {
+        clearAll();
+        return;
+    }  else if (e.target.getAttribute('id') == "btn-back") {
+        backAction();
+    } else if (operatorButtons.includes(e.target)) {
+        operatorAction(e.target);
+    } else if (e.target.getAttribute('id') == "btn-equal") {
+        equalsAction();
     } else return;
-    console.log(valList);
-    console.log(valStack);
     updateDisplay();
+
+    //console.log(valList);
+    //console.log(valStack);
 });
