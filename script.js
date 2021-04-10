@@ -24,6 +24,7 @@ function operate(operator, a, b) {
 let valList = '';
 let valStack = []
 let acceptOperator = false;
+let allowEquals = false;
 let answerGiven = false;
 
 const numberButtons = Array.from(document.querySelectorAll(".num"));
@@ -36,18 +37,22 @@ function addToStack(val) {
 
 function updateDisplay() {
     if (answerGiven) {
-    display.textContent = valStack[0];
+        display.textContent =  valStack[0];
     }
-    else display.textContent = valList;
+    else {display.textContent = valList;}
+    if (valList == "") {
+        display.textContent = '0';
+    } 
+    console.log("display updated")
 }
 
 function clearAll() {
-    display.textContent = '0';
     valList = '';
     valStack = [];
 }
 
 function numberAction(button) {
+    allowEquals = true;
     if (answerGiven) { 
         valList = '';
         answerGiven = false;
@@ -59,10 +64,23 @@ function numberAction(button) {
 
 function backAction() {
     answerGiven = false;
-    if (valList.slice(-1) == " ") {
-        valList = valList.slice(0, -3);
-    } else valList = valList.slice(0, -1); 
-    acceptOperator = true;
+    let noSpaceList = valList.replace(' ',"").trim();
+    let tempAllItems = getAllItems()
+    let lastItem = noSpaceList.slice(-1);
+    if (isOperator(lastItem)) {
+        valList = valList.slice(0, -3)
+    } else {
+        valList = valList.slice(0, -1); 
+    }
+    let newLastItem = noSpaceList.slice(-2, -1);
+    if (isOperator(newLastItem)) {
+        acceptOperator = false;
+        allowEquals = false;
+    }
+    else {
+        acceptOperator = true;
+        allowEquals = true;
+    }
 }
 
 function operatorAction(op) {
@@ -74,38 +92,53 @@ function operatorAction(op) {
         const valToAdd = ` ${op.getAttribute("data-disp")} `;
         addToStack(valToAdd);
         acceptOperator = false;
+        allowEquals = false;
     }
 }
 
 function equalsAction() {
-    valStack = valList.split(' ');
-        while (valStack.length > 1) {
-            let sum = operate(valStack[1],valStack[0],valStack[2]);
-            valStack[0] = `${sum}`;
-            valStack.splice(1, 2);
-        }
-    answerGiven = true;
+    if (allowEquals) {
+        valStack = valList.split(' ');
+            while (valStack.length > 1) {
+                let ans = operate(valStack[1],valStack[0],valStack[2]);
+                roundedAns = Number.parseFloat(ans).toFixed(9);
+                valStack[0] = `${+roundedAns}`;
+                valStack.splice(1, 2);
+            }
+        answerGiven = true;
+        allowEquals = false;
+    }
 }
 
 function hasDecimal() {
-    console.log(valList);
-    let allItems = valList.split(/([+\-x/])/);
-    let allNums = allItems.filter( num => num.match(/\d/));
-    console.log(allNums);
-    let currentNumber = `${allNums[allNums.length - 1]}`;
-    console.log(currentNumber);
-    console.log(currentNumber.includes('.'));
+    let currentNumber = getLastNumber(getAllItems());
+    
     if (currentNumber.includes('.')) return true;
     return false;
 }
 
+function getLastNumber(items) {
+    let allNums = items.filter( num => num.match(/[\d.]/g));
+    let lastNumber = `${allNums[allNums.length - 1]}`;
+    return lastNumber;
+}
+
+function isOperator(item) {
+    if ("-+/x".includes(item)) return true;
+    return false;
+}
+
+function getAllItems() {
+    let tempList = valList.trim();
+    let allItems = tempList.split(" ");
+    return allItems
+}
 
 function decAction() {
-    console.log("what")
     if (answerGiven) { 
         valList = '';
         answerGiven = false;
-        }
+    }
     const valToAdd = '.'
     addToStack(valToAdd);
     acceptOperator = true;
@@ -119,7 +152,6 @@ document.addEventListener('click', (e) => {
         decAction();
     } else if (e.target.getAttribute('id') == "btn-clear") {
         clearAll();
-        return;
     }  else if (e.target.getAttribute('id') == "btn-back") {
         backAction();
     } else if (operatorButtons.includes(e.target)) {
@@ -129,7 +161,6 @@ document.addEventListener('click', (e) => {
     } else return;
     updateDisplay();
 
-    hasDecimal() ;
-    //console.log(valList);
-    //console.log(valStack);
+    console.log('=======' + e.target.getAttribute('id'))
+    console.log(`${valList} / ` + valStack);
 });

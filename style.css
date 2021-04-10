@@ -33,14 +33,15 @@ main {
     width: 95%;
     background: ivory;
     border: 1px solid black;
+    overflow:hidden;
+    white-space: nowrap;
 }
 
 #display-content {
+    max-width: 280px;
     font-size: 30px;
-    padding: 0 5px;
-    max-height: 50px;
-    max-width: 100%;
-    overflow: hidden;
+    line-height: 3.5rem;
+    float: right;
 }
 
 #buttons-div {
