@@ -31,7 +31,9 @@ const numberButtons = Array.from(document.querySelectorAll(".num"));
 const operatorButtons = Array.from(document.querySelectorAll(".op"));
 const display = document.querySelector("#display-content")
 
-function addToStack(val) {
+const itemRegex = new RegExp(/\d+\.?\d*|[+\-/x]/g);
+
+function addToLists(val) {
     valList += val;
 }
 
@@ -58,29 +60,13 @@ function numberAction(button) {
         answerGiven = false;
         }
     const valToAdd = button.getAttribute("data-val");
-    addToStack(valToAdd);
+    addToLists(valToAdd);
     acceptOperator = true;
 }
 
 function backAction() {
     answerGiven = false;
-    let noSpaceList = valList.replace(' ',"").trim();
-    let tempAllItems = getAllItems()
-    let lastItem = noSpaceList.slice(-1);
-    if (isOperator(lastItem)) {
-        valList = valList.slice(0, -3)
-    } else {
-        valList = valList.slice(0, -1); 
-    }
-    let newLastItem = noSpaceList.slice(-2, -1);
-    if (isOperator(newLastItem)) {
-        acceptOperator = false;
-        allowEquals = false;
-    }
-    else {
-        acceptOperator = true;
-        allowEquals = true;
-    }
+    valList = valList.slice(0, -1); 
 }
 
 function operatorAction(op) {
@@ -89,8 +75,8 @@ function operatorAction(op) {
             valList = valStack[0];
         }
         answerGiven = false;
-        const valToAdd = ` ${op.getAttribute("data-disp")} `;
-        addToStack(valToAdd);
+        const valToAdd = `${op.getAttribute("data-disp")}`;
+        addToLists(valToAdd);
         acceptOperator = false;
         allowEquals = false;
     }
@@ -98,7 +84,7 @@ function operatorAction(op) {
 
 function equalsAction() {
     if (allowEquals) {
-        valStack = valList.split(' ');
+        valStack = getAllItems();
             while (valStack.length > 1) {
                 let ans = operate(valStack[1],valStack[0],valStack[2]);
                 roundedAns = Number.parseFloat(ans).toFixed(9);
@@ -110,27 +96,21 @@ function equalsAction() {
     }
 }
 
-function hasDecimal() {
-    let currentNumber = getLastNumber(getAllItems());
-    
-    if (currentNumber.includes('.')) return true;
+function hasDecimal(item) {
+    if (item.includes('.')) return true;
     return false;
 }
 
-function getLastNumber(items) {
-    let allNums = items.filter( num => num.match(/[\d.]/g));
-    let lastNumber = `${allNums[allNums.length - 1]}`;
-    return lastNumber;
-}
 
 function isOperator(item) {
+    if (!item) return false;
     if ("-+/x".includes(item)) return true;
     return false;
 }
 
 function getAllItems() {
-    let tempList = valList.trim();
-    let allItems = tempList.split(" ");
+    let allItems = valList.match(itemRegex);
+    console.log("regex results: " + allItems);
     return allItems
 }
 
@@ -140,27 +120,44 @@ function decAction() {
         answerGiven = false;
     }
     const valToAdd = '.'
-    addToStack(valToAdd);
+    addToLists(valToAdd);
     acceptOperator = true;
 }
 
+function checkCurrentChar() {
+    const currentChar = valList.slice(-1);
+    console.log(currentChar);
+    if (isOperator(currentChar)) {
+        console.log(currentChar + " is an operator");
+        allowEquals = false;
+        acceptOperator = false;
+    } else {
+        console.log(currentChar + " NOT an operator");
+        allowEquals = true;
+        acceptOperator = true;
+    }
+    return currentChar
+}
+
 document.addEventListener('click', (e) => {
+    const currentChar = checkCurrentChar();
+    const buttonType = e.target.getAttribute('id');
     if (numberButtons.includes(e.target)) { 
         numberAction(e.target);
-    } else if (e.target.getAttribute('id') == "btn-dec") {
-        if (hasDecimal()) return;
+    } else if (buttonType == "btn-dec") {
+        if (hasDecimal(currentChar)) return;
         decAction();
-    } else if (e.target.getAttribute('id') == "btn-clear") {
+    } else if (buttonType == "btn-clear") {
         clearAll();
-    }  else if (e.target.getAttribute('id') == "btn-back") {
+    }  else if (buttonType == "btn-back") {
         backAction();
     } else if (operatorButtons.includes(e.target)) {
         operatorAction(e.target);
-    } else if (e.target.getAttribute('id') == "btn-equal") {
+    } else if (buttonType == "btn-equal") {
         equalsAction();
     } else return;
     updateDisplay();
 
-    console.log('=======' + e.target.getAttribute('id'))
-    console.log(`${valList} / ` + valStack);
+    //console.log('=======' + e.target.getAttribute('id'))
+    //console.log(`${valList} / ` + valStack);
 });

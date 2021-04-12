@@ -27,6 +27,7 @@ main {
 
 #screen {
     margin: auto;
+    margin-top: 20px;
     text-align: right;
     min-height: 50px;
     max-height: 50px;
@@ -38,6 +39,7 @@ main {
 }
 
 #display-content {
+    padding-right: 5px;
     max-width: 280px;
     font-size: 30px;
     line-height: 3.5rem;
@@ -45,6 +47,7 @@ main {
 }
 
 #buttons-div {
+    margin-top: 30px;
     padding: 10px;
     display: grid;
     grid-template-columns: repeat(5, 50px);
