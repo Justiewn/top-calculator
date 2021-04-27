@@ -49,6 +49,8 @@ function updateDisplay() {
 }
 
 function clearAll() {
+    acceptOperator = false;
+    answerGiven = false;
     valList = '';
     valStack = [];
 }
@@ -126,8 +128,10 @@ function decAction() {
 
 function checkCurrentChar() {
     const currentChar = valList.slice(-1);
-    console.log(currentChar);
-    if (isOperator(currentChar)) {
+    if (!currentChar) {
+        return
+    }
+    else if (isOperator(currentChar)) {
         console.log(currentChar + " is an operator");
         allowEquals = false;
         acceptOperator = false;
